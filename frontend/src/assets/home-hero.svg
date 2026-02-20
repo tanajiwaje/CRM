@@ -1,0 +1,32 @@
+<svg width="920" height="620" viewBox="0 0 920 620" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="920" height="620" rx="28" fill="#0F172A"/>
+  <circle cx="742" cy="130" r="80" fill="#1D4ED8" fill-opacity="0.45"/>
+  <circle cx="804" cy="210" r="54" fill="#3B82F6" fill-opacity="0.35"/>
+  <rect x="84" y="92" width="752" height="438" rx="22" fill="#111E35" stroke="#334155"/>
+  <rect x="122" y="130" width="320" height="154" rx="14" fill="#172B4D"/>
+  <rect x="142" y="152" width="156" height="14" rx="7" fill="#93C5FD"/>
+  <rect x="142" y="180" width="256" height="10" rx="5" fill="#4B5E81"/>
+  <rect x="142" y="202" width="220" height="10" rx="5" fill="#4B5E81"/>
+  <rect x="142" y="224" width="188" height="10" rx="5" fill="#4B5E81"/>
+  <rect x="122" y="312" width="320" height="180" rx="14" fill="#172B4D"/>
+  <rect x="142" y="334" width="114" height="96" rx="10" fill="#1E40AF"/>
+  <rect x="270" y="334" width="152" height="14" rx="7" fill="#93C5FD"/>
+  <rect x="270" y="360" width="138" height="10" rx="5" fill="#4B5E81"/>
+  <rect x="270" y="382" width="126" height="10" rx="5" fill="#4B5E81"/>
+  <rect x="270" y="404" width="116" height="10" rx="5" fill="#4B5E81"/>
+  <rect x="478" y="130" width="320" height="360" rx="14" fill="#172B4D"/>
+  <rect x="498" y="152" width="280" height="112" rx="12" fill="#1E40AF"/>
+  <rect x="522" y="178" width="88" height="62" rx="6" fill="#0F172A"/>
+  <rect x="621" y="178" width="133" height="10" rx="5" fill="#C7D2FE"/>
+  <rect x="621" y="198" width="121" height="10" rx="5" fill="#B6C5E9"/>
+  <rect x="621" y="218" width="101" height="10" rx="5" fill="#B6C5E9"/>
+  <rect x="498" y="284" width="280" height="186" rx="12" fill="#111E35" stroke="#334155"/>
+  <path d="M530 430V374L571 345L612 374V430H530Z" fill="#2563EB"/>
+  <rect x="566" y="397" width="12" height="33" fill="#0F172A"/>
+  <rect x="631" y="356" width="112" height="74" rx="8" fill="#1E40AF"/>
+  <line x1="640" y1="379" x2="734" y2="379" stroke="#93C5FD" stroke-width="3"/>
+  <line x1="640" y1="395" x2="734" y2="395" stroke="#93C5FD" stroke-width="3"/>
+  <line x1="640" y1="411" x2="734" y2="411" stroke="#93C5FD" stroke-width="3"/>
+  <rect x="500" y="80" width="124" height="28" rx="14" fill="#1E40AF"/>
+  <text x="562" y="99" fill="#EFF6FF" text-anchor="middle" font-size="12" font-family="Arial, sans-serif">POWERFLOW</text>
+</svg>

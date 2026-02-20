@@ -1,0 +1,586 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model LeadSource {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  leads             Lead[]
+  marketingAccounts Account[] @relation("AccountMarketingSource")
+}
+
+model FundingType {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts             Account[]
+  leads                Lead[]
+  opportunities        Opportunity[]
+  workOrders           WorkOrder[]
+  evidenceRequirements EvidenceRequirement[]
+}
+
+model ProductOffering {
+  id              Int      @id @default(autoincrement())
+  name            String   @unique
+  technologyGroup String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  leads                Lead[]
+  opportunities        Opportunity[]
+  evidenceRequirements EvidenceRequirement[]
+  qaChecklists         QAChecklist[]
+}
+
+model AssessmentPath {
+  id             Int      @id @default(autoincrement())
+  name           String   @unique
+  requiresSurvey Boolean  @default(false)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  opportunities Opportunity[]
+}
+
+model WorkOrderType {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workOrders           WorkOrder[]
+  evidenceRequirements EvidenceRequirement[]
+  qaChecklists         QAChecklist[]
+}
+
+model StatusMaster {
+  id        Int      @id @default(autoincrement())
+  category  String
+  key       String
+  label     String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([category, key])
+}
+
+model ContactMethod {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts Account[]
+  contacts Contact[]
+}
+
+model ContactRole {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  contacts Contact[]
+}
+
+model ConsentStatus {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  contacts Contact[]
+}
+
+model Campaign {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  leads Lead[]
+}
+
+model LeadChannel {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  leads Lead[]
+}
+
+model PropertyType {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  properties Property[]
+}
+
+model TenureType {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  properties Property[]
+}
+
+model EvidenceCategory {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  requirements EvidenceRequirement[]
+  items        EvidenceItem[]
+}
+
+model Account {
+  id                      Int            @id @default(autoincrement())
+  accountName             String
+  accountType             String         @default("Customer")
+  phone                   String?
+  email                   String?
+  billingAddressLine1     String?
+  billingAddressLine2     String?
+  billingCity             String?
+  billingPostcode         String?
+  billingCountry          String?
+  preferredContactMethodId Int?
+  customerFundingTypeId   Int?
+  marketingSourceId       Int?
+  primaryContactId        Int?           @unique
+  createdAt               DateTime       @default(now())
+  updatedAt               DateTime       @updatedAt
+
+  preferredContactMethod ContactMethod? @relation(fields: [preferredContactMethodId], references: [id])
+  customerFundingType    FundingType?   @relation(fields: [customerFundingTypeId], references: [id])
+  marketingSource        LeadSource?    @relation("AccountMarketingSource", fields: [marketingSourceId], references: [id])
+  primaryContact         Contact?       @relation("AccountPrimaryContact", fields: [primaryContactId], references: [id], onDelete: SetNull)
+
+  contacts      Contact[]      @relation("AccountContacts")
+  properties    Property[]
+  opportunities Opportunity[]
+  cases         Case[]
+  qualifiedLeads Lead[]        @relation("LeadQualifiedAccount")
+}
+
+model Contact {
+  id                       Int          @id @default(autoincrement())
+  firstName                String
+  lastName                 String
+  mobile                   String?
+  email                    String?
+  accountId                Int?
+  roleId                   Int?
+  preferredContactMethodId Int?
+  consentStatusId          Int?
+  createdAt                DateTime     @default(now())
+  updatedAt                DateTime     @updatedAt
+
+  account                Account?      @relation("AccountContacts", fields: [accountId], references: [id], onDelete: SetNull)
+  role                   ContactRole?  @relation(fields: [roleId], references: [id])
+  preferredContactMethod ContactMethod? @relation(fields: [preferredContactMethodId], references: [id])
+  consentStatus          ConsentStatus? @relation(fields: [consentStatusId], references: [id])
+
+  primaryForAccounts    Account?       @relation("AccountPrimaryContact")
+  primaryForProperties  Property[]     @relation("PropertyPrimaryContact")
+  primaryOpportunities  Opportunity[]  @relation("OpportunityPrimaryContact")
+  cases                 Case[]
+  qualifiedLeads        Lead[]         @relation("LeadQualifiedContact")
+}
+
+model Lead {
+  id                    Int        @id @default(autoincrement())
+  fullName              String?
+  companyName           String?
+  phone                 String?
+  email                 String?
+  sourceId              Int?
+  campaignId            Int?
+  createdFromId         Int?
+  duplicateOfLeadId     Int?
+  duplicateStatus       String?    @default("Unique")
+  fundingTypeId         Int?
+  interestedProductId   Int?
+  propertyAddressLine1  String?
+  propertyAddressLine2  String?
+  propertyCity          String?
+  propertyPostcode      String?
+  propertyCountry       String?
+  qualificationStatus   String?    @default("New")
+  disqualificationReason String?
+  notes                 String?
+  qualifiedAccountId    Int?
+  qualifiedContactId    Int?
+  qualifiedPropertyId   Int?
+  qualifiedOpportunityId Int?
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+
+  source             LeadSource?      @relation(fields: [sourceId], references: [id])
+  campaign           Campaign?        @relation(fields: [campaignId], references: [id])
+  createdFrom        LeadChannel?     @relation(fields: [createdFromId], references: [id])
+  duplicateOfLead    Lead?            @relation("LeadDuplicate", fields: [duplicateOfLeadId], references: [id])
+  duplicateLeads     Lead[]           @relation("LeadDuplicate")
+  fundingType        FundingType?     @relation(fields: [fundingTypeId], references: [id])
+  interestedProduct  ProductOffering? @relation(fields: [interestedProductId], references: [id])
+
+  qualifiedAccount     Account?      @relation("LeadQualifiedAccount", fields: [qualifiedAccountId], references: [id], onDelete: SetNull)
+  qualifiedContact     Contact?      @relation("LeadQualifiedContact", fields: [qualifiedContactId], references: [id], onDelete: SetNull)
+  qualifiedProperty    Property?     @relation("LeadQualifiedProperty", fields: [qualifiedPropertyId], references: [id], onDelete: SetNull)
+  qualifiedOpportunity Opportunity?  @relation("LeadQualifiedOpportunity", fields: [qualifiedOpportunityId], references: [id], onDelete: SetNull)
+  properties           Property[]    @relation("PropertyCreatedFromLead")
+}
+
+model Property {
+  id                    Int        @id @default(autoincrement())
+  propertyName          String
+  accountId             Int
+  primaryContactId      Int?
+  addressLine1          String?
+  addressLine2          String?
+  city                  String?
+  postcode              String?
+  country               String?
+  propertyTypeId        Int?
+  tenureTypeId          Int?
+  accessNotes           String?
+  parkingNotes          String?
+  surveyRequiredDefault Boolean    @default(false)
+  utilitiesNotes        String?
+  createdFromLeadId     Int?
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+
+  account         Account      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  primaryContact  Contact?     @relation("PropertyPrimaryContact", fields: [primaryContactId], references: [id], onDelete: SetNull)
+  propertyType    PropertyType? @relation(fields: [propertyTypeId], references: [id])
+  tenureType      TenureType?   @relation(fields: [tenureTypeId], references: [id])
+  createdFromLead Lead?         @relation("PropertyCreatedFromLead", fields: [createdFromLeadId], references: [id], onDelete: SetNull)
+
+  opportunities   Opportunity[]
+  workOrders      WorkOrder[]
+  evidenceItems   EvidenceItem[]
+  paymentRequests PaymentRequest[]
+  cases           Case[]
+  quotes          Quote[]
+  qualifiedLeads  Lead[]            @relation("LeadQualifiedProperty")
+}
+
+model Opportunity {
+  id                    Int        @id @default(autoincrement())
+  opportunityName       String
+  accountId             Int
+  primaryContactId      Int?
+  propertyId            Int
+  fundingTypeId         Int?
+  productOfferingId     Int?
+  assessmentPathId      Int?
+  requiresSurvey        Boolean    @default(false)
+  salesStage            String?    @default("New")
+  targetInstallWindowStart DateTime?
+  targetInstallWindowEnd DateTime?
+  estimatedValue        Float?
+  quoteStatus           String?    @default("Draft")
+  acceptanceDate        DateTime?
+  deliveryStatus        String?    @default("Not Started")
+  evidenceStatus        String?    @default("Not Required")
+  qaStatus              String?    @default("Not Started")
+  paymentLinkSent       Boolean    @default(false)
+  paymentLinkSentOn     DateTime?
+  paymentRequested      Boolean    @default(false)
+  paymentRequestedOn    DateTime?
+  xeroInvoiceStatus     String?    @default("Not Synced")
+  xeroInvoiceNumber     String?
+  xeroInvoiceId         String?
+  closeBlockedReason    String?
+  actualCloseDate       DateTime?
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+
+  account         Account        @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  primaryContact  Contact?       @relation("OpportunityPrimaryContact", fields: [primaryContactId], references: [id], onDelete: SetNull)
+  property        Property       @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  fundingType     FundingType?   @relation(fields: [fundingTypeId], references: [id])
+  productOffering ProductOffering? @relation(fields: [productOfferingId], references: [id])
+  assessmentPath  AssessmentPath? @relation(fields: [assessmentPathId], references: [id])
+
+  quotes          Quote[]
+  workOrders      WorkOrder[]
+  evidenceItems   EvidenceItem[]
+  timelineNotes   OpportunityTimeline[]
+  cases           Case[]
+  paymentRequests PaymentRequest[]
+  xeroInvoices    XeroInvoiceLink[]
+  leads           Lead[]              @relation("LeadQualifiedOpportunity")
+  qaResults       QAResult[]
+}
+
+model OpportunityTimeline {
+  id            Int         @id @default(autoincrement())
+  opportunityId Int
+  note          String
+  createdBy     String?
+  createdAt     DateTime    @default(now())
+
+  opportunity Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+}
+
+model Quote {
+  id               Int       @id @default(autoincrement())
+  quoteName        String
+  quoteNumber      String?
+  opportunityId    Int
+  propertyId       Int?
+  quoteType        String?   @default("Initial")
+  totalAmount      Float     @default(0)
+  status           String    @default("Draft")
+  sentOn           DateTime?
+  acceptedOn       DateTime?
+  acceptanceMethod String?
+  customerProof    String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  opportunity Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  property    Property?   @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  lines       QuoteLine[]
+}
+
+model QuoteLine {
+  id          Int      @id @default(autoincrement())
+  quoteId     Int
+  description String
+  quantity    Float    @default(1)
+  unitPrice   Float    @default(0)
+  lineTotal   Float    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  quote Quote @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+}
+
+model WorkOrder {
+  id                    Int       @id @default(autoincrement())
+  workOrderNumber       String?
+  opportunityId         Int
+  propertyId            Int
+  workOrderTypeId       Int
+  fundingTypeId         Int?
+  evidenceRequired      Boolean   @default(false)
+  evidenceGateStatus    String    @default("Not Required")
+  qaGateStatus          String    @default("Not Required")
+  completionBlockedReason String?
+  scheduledStart        DateTime?
+  scheduledEnd          DateTime?
+  actualStart           DateTime?
+  actualEnd             DateTime?
+  status                String    @default("Not Started")
+  substatus             String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  opportunity   Opportunity  @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  property      Property     @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  workOrderType WorkOrderType @relation(fields: [workOrderTypeId], references: [id])
+  fundingType   FundingType? @relation(fields: [fundingTypeId], references: [id])
+
+  bookings      Booking[]
+  evidenceItems EvidenceItem[]
+  qaResults     QAResult[]
+  cases         Case[]       @relation("CaseRemedialWorkOrder")
+}
+
+model Booking {
+  id            Int       @id @default(autoincrement())
+  workOrderId   Int
+  resourceName  String
+  resourceType  String?
+  startTime     DateTime
+  endTime       DateTime
+  bookingStatus String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+}
+
+model EvidenceRequirement {
+  id               Int       @id @default(autoincrement())
+  name             String
+  productOfferingId Int?
+  workOrderTypeId  Int?
+  fundingTypeId    Int?
+  evidenceCategoryId Int?
+  requiredCount    Int       @default(1)
+  mandatory        Boolean   @default(true)
+  sortOrder        Int       @default(0)
+  isActive         Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  productOffering ProductOffering? @relation(fields: [productOfferingId], references: [id])
+  workOrderType   WorkOrderType?   @relation(fields: [workOrderTypeId], references: [id])
+  fundingType     FundingType?     @relation(fields: [fundingTypeId], references: [id])
+  evidenceCategory EvidenceCategory? @relation(fields: [evidenceCategoryId], references: [id])
+
+  evidenceItems EvidenceItem[]
+}
+
+model EvidenceItem {
+  id                 Int       @id @default(autoincrement())
+  name               String
+  opportunityId      Int?
+  workOrderId        Int?
+  propertyId         Int?
+  requirementId      Int?
+  evidenceTypeId     Int?
+  filePath           String?
+  capturedBy         String?
+  capturedOn         DateTime?
+  status             String    @default("Pending")
+  reviewer           String?
+  reviewedOn         DateTime?
+  rejectionReason    String?
+  notes              String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  opportunity  Opportunity?         @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  workOrder    WorkOrder?           @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  property     Property?            @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  requirement  EvidenceRequirement? @relation(fields: [requirementId], references: [id])
+  evidenceType EvidenceCategory?    @relation(fields: [evidenceTypeId], references: [id])
+}
+
+model QAChecklist {
+  id               Int       @id @default(autoincrement())
+  name             String
+  productOfferingId Int?
+  workOrderTypeId  Int?
+  isActive         Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  productOffering ProductOffering? @relation(fields: [productOfferingId], references: [id])
+  workOrderType   WorkOrderType?   @relation(fields: [workOrderTypeId], references: [id])
+  items           QAChecklistItem[]
+}
+
+model QAChecklistItem {
+  id          Int       @id @default(autoincrement())
+  checklistId Int
+  itemText    String
+  mandatory   Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  checklist QAChecklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+  results   QAResult[]
+}
+
+model QAResult {
+  id              Int       @id @default(autoincrement())
+  opportunityId   Int?
+  workOrderId     Int?
+  checklistItemId Int
+  result          String?   @default("N/A")
+  notes           String?
+  checkedBy       String?
+  checkedOn       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  opportunity  Opportunity?    @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  workOrder    WorkOrder?      @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  checklistItem QAChecklistItem @relation(fields: [checklistItemId], references: [id], onDelete: Cascade)
+}
+
+model PaymentRequest {
+  id                Int       @id @default(autoincrement())
+  opportunityId     Int
+  propertyId        Int?
+  amountRequested   Float
+  paymentLinkUrl    String?
+  paymentLinkSentOn DateTime?
+  sentBy            String?
+  paymentStatus     String    @default("Not Sent")
+  paidOn            DateTime?
+  notes             String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  opportunity Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  property    Property?   @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+}
+
+model XeroInvoiceLink {
+  id                Int       @id @default(autoincrement())
+  opportunityId     Int       @unique
+  xeroInvoiceId     String?
+  xeroInvoiceNumber String?
+  xeroStatus        String?
+  total             Float?
+  lastSyncedOn      DateTime?
+  syncError         String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  opportunity Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+}
+
+model Case {
+  id                 Int       @id @default(autoincrement())
+  title              String
+  caseType           String?   @default("Complaint")
+  accountId          Int
+  contactId          Int?
+  propertyId         Int
+  relatedOpportunityId Int
+  priority           String?
+  slaDueDate         DateTime?
+  rootCause          String?
+  resolutionType     String?
+  outcomeNotes       String?
+  requiresSiteVisit  Boolean   @default(false)
+  remedialWorkOrderId Int?
+  status             String?   @default("Open")
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  account            Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  contact            Contact?    @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  property           Property    @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  relatedOpportunity Opportunity @relation(fields: [relatedOpportunityId], references: [id], onDelete: Cascade)
+  remedialWorkOrder  WorkOrder?  @relation("CaseRemedialWorkOrder", fields: [remedialWorkOrderId], references: [id], onDelete: SetNull)
+}
