@@ -1,0 +1,92 @@
+CRM TECHNICAL DOCUMENTATION (FOR DEVELOPERS)
+============================================
+
+1. Stack and architecture
+- Frontend: Vue 3 + Vue Router + Vite
+- Backend: Node.js + Express
+- Database: SQLite via Prisma
+- Auth: JWT token (Bearer), in-memory demo users
+- Uploads: Multer + static files from backend /uploads
+
+2. Repository structure
+- frontend/
+  - src/pages: feature screens
+  - src/services/api.js: API client and auth header handling
+  - src/router/index.js: route map + role requirements
+  - vite.config.js: dev server, host, and /api proxy
+- backend/
+  - src/app.js: middleware and route wiring
+  - src/server.js: HTTP server startup
+  - src/modules/*: domain modules (auth, leads, opportunities, workorders, etc.)
+  - src/shared/middleware/auth.js: JWT validation + role guard
+  - src/shared/auth/users.js: demo users with hashed passwords
+  - prisma/schema.prisma: data model
+  - prisma/seed.js: demo data seed
+
+3. Runtime ports and flow
+- Frontend dev server: 5173
+- Backend API: 4000 (default from server.js if PORT not provided)
+- Frontend API default: /api
+- Vite proxy rewrites /api/* -> http://localhost:4000/*
+- This makes localhost and ngrok frontend URL both work without changing API base URL.
+
+4. Environment configuration
+- backend/.env
+  - Required: DATABASE_URL="file:./crm.db"
+  - Optional: JWT_SECRET=your-secret
+- frontend/.env (optional)
+  - VITE_API_BASE_URL=/api (recommended)
+  - If not set, app already defaults to /api.
+
+5. Authentication and authorization
+- Login endpoint: POST /auth/login
+- Token profile includes role and is checked by requireAuth middleware.
+- Route protection is applied in backend/src/app.js via requireRole([...]).
+- Frontend route meta also enforces role-based navigation.
+
+6. Key backend route groups
+- /auth
+- /lookups
+- /leads
+- /customers
+- /opportunities
+- /quotes and quote lines (mounted from root)
+- /workorders
+- /evidence
+- /qa
+- /payments
+- /invoices
+- /cases
+- /admin
+- /health (public check)
+
+7. Database and seed behavior
+- Seed script clears and re-creates demo data.
+- Includes lookup data, opportunities, quotes, work orders, evidence items, QA results, payments, invoices, and cases.
+- Demo users are not stored in DB; they are static in backend/src/shared/auth/users.js.
+
+8. Development commands (Windows PowerShell)
+- Backend
+  cd backend
+  npm.cmd install
+  npm.cmd run prisma:generate
+  npm.cmd run db:seed
+  npm.cmd run dev
+- Frontend
+  cd frontend
+  npm.cmd install
+  npm.cmd run dev
+
+9. Public sharing with ngrok
+- Start frontend and backend locally first.
+- Run: ngrok http 5173
+- Share the generated https://*.ngrok-free.dev URL.
+- Because frontend calls /api and Vite proxies to backend, API should work for public users too.
+
+10. Common issues
+- 403 on ngrok root:
+  Check frontend/vite.config.js has host enabled and allowedHosts=true, then restart Vite.
+- API not reachable from public URL:
+  Ensure backend is running on localhost:4000 and frontend still uses /api default.
+- npm blocked by PowerShell policy:
+  Use npm.cmd instead of npm.

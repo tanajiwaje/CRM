@@ -1,0 +1,67 @@
+GITHUB DOWNLOAD AND RUN STEPS (WINDOWS)
+=======================================
+
+1. Prerequisites
+- Install Git
+- Install Node.js LTS (includes npm)
+- Install ngrok (optional, only for public URL sharing)
+
+2. Clone the repository
+1. Open PowerShell.
+2. Run:
+   git clone <YOUR_GITHUB_REPO_URL>
+3. Enter project folder:
+   cd CRM
+
+3. Backend setup
+1. Go to backend folder:
+   cd backend
+2. Install dependencies:
+   npm.cmd install
+3. Create backend .env file if missing:
+   DATABASE_URL="file:./crm.db"
+4. Generate Prisma client:
+   npm.cmd run prisma:generate
+5. Seed demo data:
+   npm.cmd run db:seed
+6. Start backend:
+   npm.cmd run dev
+7. Keep this terminal open.
+
+4. Frontend setup
+1. Open a second PowerShell terminal.
+2. Go to frontend folder:
+   cd <PATH_TO_PROJECT>\frontend
+3. Install dependencies:
+   npm.cmd install
+4. Start frontend:
+   npm.cmd run dev
+5. Open:
+   http://localhost:5173
+
+5. Demo login accounts
+- admin@crm.local / Admin@123
+- ops@crm.local / Ops@123
+- sales@crm.local / Sales@123
+- engineer@crm.local / Engineer@123
+
+6. Optional: expose to internet with ngrok
+1. Open a third PowerShell terminal.
+2. Run:
+   ngrok http 5173
+3. Share the generated HTTPS URL.
+4. Confirm backend is running on localhost:4000.
+
+7. Verify app health
+- Frontend page opens: http://localhost:5173
+- Backend health endpoint:
+  http://localhost:4000/health
+  Expected response: {"ok":true}
+
+8. Troubleshooting
+- If PowerShell blocks npm:
+  use npm.cmd instead of npm
+- If frontend shows 403 via ngrok:
+  restart frontend dev server after config changes
+- If login/API fails:
+  check backend terminal for errors and confirm port 4000 is free

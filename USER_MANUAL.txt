@@ -1,0 +1,54 @@
+CRM USER MANUAL
+================
+
+1. What this app does
+- This CRM supports lead-to-cash flow:
+  Lead -> Qualification -> Opportunity -> Quote -> Work Order -> Evidence/QA -> Payment/Invoice -> Case management.
+
+2. Open the app
+- Local URL: http://localhost:5173
+- Public URL: your active ngrok URL (example: https://xxxx.ngrok-free.dev)
+
+3. Login accounts (demo users)
+- Admin
+  Email: admin@crm.local
+  Password: Admin@123
+- Ops
+  Email: ops@crm.local
+  Password: Ops@123
+- Sales
+  Email: sales@crm.local
+  Password: Sales@123
+- Engineer
+  Email: engineer@crm.local
+  Password: Engineer@123
+
+4. Main screens
+- Dashboard: overall view after login.
+- Leads: create, list, view, qualify/disqualify leads.
+- Opportunities: manage opportunity progress and details.
+- Work Orders: schedule and execute field work.
+- Evidence/QA: upload evidence files and complete QA checks.
+- Finance: payment and invoice follow-up.
+- Cases: complaints and remedial tracking.
+- Admin: admin-only controls.
+
+5. Role access summary
+- Admin: full access to all modules.
+- Ops: operations, work orders, evidence/QA, finance, cases, leads.
+- Sales: leads and opportunities focused views.
+- Engineer: work orders, evidence/QA, opportunities (delivery support).
+
+6. Typical usage flow
+1. Login.
+2. Create or open a lead.
+3. Qualify lead to customer/account/opportunity.
+4. Create and send quote.
+5. Accept quote and create work order(s).
+6. Upload evidence and complete QA.
+7. Track payment and invoice status.
+8. Raise or resolve cases if issues occur.
+
+7. Notes
+- Uploaded files are served from backend /uploads.
+- If screen access is blocked, your user role does not have permission for that route.
